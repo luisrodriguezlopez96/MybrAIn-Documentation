@@ -7,6 +7,7 @@ Documentación centralizada del ecosistema MybrAIn - Sistema SCADA industrial de
 - [Descripción General](#descripción-general)
 - [Arquitectura del Sistema](#arquitectura-del-sistema)
 - [Repositorios del Ecosistema](#repositorios-del-ecosistema)
+- [Guía de Despliegue en Planta](#guía-de-despliegue-en-planta)
 - [Flujo de Datos](#flujo-de-datos)
 - [Sincronización Automática](#sincronización-automática)
 
@@ -94,6 +95,21 @@ graph TB
 - Herramientas y utilidades compartidas del ecosistema.
 - Capa de integración entre los diferentes servicios MybrAIn.
 
+## 🏭 Guía de Despliegue en Planta
+
+El despliegue de MybrAIn requiere una infraestructura robusta para garantizar operación 24/7.
+
+### Requisitos de Hardware (PC Industrial)
+- **CPU**: Intel Core i5/i7 (10ª Gen+) o equivalente.
+- **RAM**: 16GB mínimo (optimizado para caché de bases de datos).
+- **Disco**: 500GB SSD NVMe (crítico para escrituras rápidas en QuestDB).
+- **SO**: Windows 11 Pro (configurado como servicio con NSSM).
+
+### Dependencias Críticas
+1. **Snap7 DLL**: Debe estar presente en `C:\Windows\System32` para comunicación PLC.
+2. **PostgreSQL 14+**: Base de datos local para configuración y estados.
+3. **Red**: Firewall abierto en puerto 102 (S7) y 3002 (API Nexus).
+
 ## 🔄 Flujo de Datos
 
 ```mermaid
@@ -135,4 +151,4 @@ graph LR
 ```
 
 ---
-**Última actualización**: Documentación corregida y alineada con la arquitectura real del sistema.
+**Última actualización**: Documentación mejorada con guía de despliegue industrial.

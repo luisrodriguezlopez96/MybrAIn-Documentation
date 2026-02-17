@@ -1,186 +1,138 @@
 # MybrAIn-Documentation
 
-Documentación centralizada del ecosistema MybrAIn - Sistema SCADA industrial
+Documentación centralizada del ecosistema MybrAIn - Sistema SCADA industrial de Clauger.
 
 ## 📋 Índice
 
 - [Descripción General](#descripción-general)
 - [Arquitectura del Sistema](#arquitectura-del-sistema)
-- [Repositorios](#repositorios)
+- [Repositorios del Ecosistema](#repositorios-del-ecosistema)
 - [Flujo de Datos](#flujo-de-datos)
 - [Sincronización Automática](#sincronización-automática)
 
 ## 🎯 Descripción General
 
-MybrAIn es un ecosistema completo de monitorización y control SCADA industrial que integra múltiples componentes para la gestión de procesos de refrigeración industrial.
+MybrAIn es un ecosistema avanzado de monitorización, control y eficiencia energética industrial desarrollado por Clauger. Integra adquisición de datos en tiempo real de PLCs, almacenamiento de alta velocidad, interfaces de supervisión reactivas y modelos de inteligencia artificial.
 
 ### Componentes Principales
 
-- **PLC_BACKEND**: Backend principal del sistema SCADA
-- **PLC_FRONTEND (FRONTEND)**: Interfaz de usuario web
-- **IA_FREEZING_SPEED_PREDICTION (Brain_ETL)**: Sistema de predicción con IA
-- **MYSQL_QUERIES_INTERFACE (BACKEND_NEXUS)**: Interfaz de consultas MySQL
-- **Mybrainsuite**: Suite de herramientas integradas
+- **PLC_BACKEND**: Sistema de Orquestación Multi-PLC (acquisition engine).
+- **FRONTEND (Interfaz Nexus)**: Interfaz de Supervisión SCADA y gestión energética.
+- **Brain_ETL (IA_FREEZING_SPEED_PREDICTION)**: Proceso de registro y lógica de IA.
+- **BACKEND_NEXUS (MYSQL_QUERIES_INTERFACE)**: Capa de servicios para la interfaz Nexus.
+- **Mybrainsuite**: Integración y utilidades del ecosistema.
 
 ## 🏗️ Arquitectura del Sistema
 
 ```mermaid
 graph TB
-    subgraph Frontend
-        A[PLC_FRONTEND<br/>React UI]
+    subgraph UI_Layer
+        A[FRONTEND<br/>Nexus React UI]
     end
     
-    subgraph Backend
-        B[PLC_BACKEND<br/>Django API]
-        C[BACKEND_NEXUS<br/>MySQL Interface]
+    subgraph Service_Layer
+        B[BACKEND_NEXUS<br/>Node.js/Express]
+        E[Mybrainsuite<br/>Integration]
     end
     
-    subgraph AI_ML
-        D[Brain_ETL<br/>IA Prediction]
+    subgraph Data_Acquisition
+        C[PLC_BACKEND<br/>Python Orchestrator]
+        D[Brain_ETL<br/>Python IA & Registry]
     end
     
-    subgraph Integration
-        E[Mybrainsuite<br/>Integration Layer]
+    subgraph Storage_Layer
+        F[(PostgreSQL<br/>Transactional)]
+        G[(QuestDB<br/>Time-Series)]
     end
     
-    subgraph Database
-        F[(PostgreSQL)]
-        G[(QuestDB)]
-        H[(MySQL)]
-    end
-    
-    A -->|HTTP/REST| B
-    A -->|HTTP/REST| C
+    A -->|REST/WS| B
     B --> F
     B --> G
-    C --> H
+    C -->|S7 Protocol| PLCs[Industrial PLCs]
+    C --> F
     D --> G
     E --> B
-    E --> C
-    E --> D
     
     style A fill:#61dafb
-    style B fill:#0c4b33
-    style C fill:#4479a1
+    style B fill:#4479a1
+    style C fill:#3776ab
     style D fill:#ff6b6b
-    style E fill:#4ecdc4
+    style F fill:#336791
+    style G fill:#f39c12
 ```
 
-## 📁 Repositorios
+## 📁 Repositorios del Ecosistema
 
-### Backend Principal
-**[PLC_BACKEND](./docs/repositories/PLC_BACKEND.md)**
-- Backend Django del sistema SCADA
-- API REST para frontend
-- Integración con PostgreSQL y QuestDB
-- WebSockets para datos en tiempo real
+### 🚀 [PLC_BACKEND](./docs/repositories/PLC_BACKEND.md)
+**Sistema de Orquestación Multi-PLC**
+- Motor de adquisición v4.5.1.
+- Hilos independientes para lectura paralela de PLCs Siemens S7 (Snap7).
+- Persistencia transaccional en **PostgreSQL**.
+- Stack: Python 3.10+, psycopg2, python-snap7.
 
-### Frontend Web
-**[PLC_FRONTEND (FRONTEND)](./docs/repositories/FRONTEND.md)**
-- Aplicación React
-- Dashboards de monitorización
-- Visualización de datos en tiempo real
-- Interfaz de control del sistema
+### 📊 [FRONTEND](./docs/repositories/FRONTEND.md)
+**Interfaz Nexus - Supervisión SCADA**
+- Interfaz reactiva de alto rendimiento (React 18 + Vite).
+- Dashboards de monitorización industrial y gestión energética.
+- Sistema de Licenciamiento por Hardware ID.
+- PWA instalable para dispositivos de planta.
 
-### Inteligencia Artificial
-**[IA_FREEZING_SPEED_PREDICTION (Brain_ETL)](./docs/repositories/Brain_ETL.md)**
-- Modelos de predicción con Machine Learning
-- ETL para procesamiento de datos
-- Predicción de velocidad de congelación
-- Optimización de procesos
+### 🧠 [Brain_ETL](./docs/repositories/Brain_ETL.md)
+**Proceso de Registro e IA**
+- Registro de datos históricos de alta velocidad.
+- Modelos de predicción para velocidad de congelación y optimización.
+- Integración directa con **QuestDB**.
 
-### Interfaz MySQL
-**[MYSQL_QUERIES_INTERFACE (BACKEND_NEXUS)](./docs/repositories/BACKEND_NEXUS.md)**
-- Interfaz de consultas MySQL
-- API para acceso a datos históricos
-- Reportes y analytics
+### 🔌 [BACKEND_NEXUS](./docs/repositories/BACKEND_NEXUS.md)
+**Interfaz de Servicios de Datos**
+- API principal para el Frontend Nexus.
+- Conecta la interfaz de usuario con los datos de **PostgreSQL** y **QuestDB**.
+- Gestiona la lógica de negocio y autenticación.
 
-### Suite Integrada
-**[Mybrainsuite](./docs/repositories/Mybrainsuite.md)**
-- Capa de integración entre componentes
-- Herramientas de gestión
-- Utilidades compartidas
+### 📦 [Mybrainsuite](./docs/repositories/Mybrainsuite.md)
+**Suite de Integración**
+- Herramientas y utilidades compartidas del ecosistema.
+- Capa de integración entre los diferentes servicios MybrAIn.
 
 ## 🔄 Flujo de Datos
 
 ```mermaid
 sequenceDiagram
-    participant U as Usuario
-    participant F as Frontend
-    participant B as Backend
-    participant DB as Database
-    participant AI as IA/ML
+    participant PLC as PLCs (S7)
+    participant PB as PLC_BACKEND
+    participant BE as Brain_ETL
+    participant DB as DBs (Postgre/Quest)
+    participant NX as BACKEND_NEXUS
+    participant UI as FRONTEND (Nexus)
     
-    U->>F: Accede al dashboard
-    F->>B: GET /api/data
-    B->>DB: Query datos
-    DB-->>B: Datos históricos
-    B-->>F: JSON response
-    F-->>U: Visualización
-    
-    B->>AI: Envía datos para predicción
-    AI->>AI: Procesa con ML
-    AI-->>B: Predicciones
-    B->>DB: Almacena predicciones
-    B-->>F: Push actualización
-    F-->>U: Alerta/Notificación
+    PLC->>PB: Captación de datos (Snap7)
+    PB->>DB: Almacena estados (PostgreSQL)
+    BE->>DB: Registra históricos (QuestDB)
+    BE->>BE: Procesa modelos IA
+    DB-->>NX: Consulta de datos
+    NX-->>UI: API REST / WebSockets
+    UI-->>UI: Visualización en tiempo real
 ```
-
-## 🔄 Sincronización Automática
-
-Este repositorio utiliza GitHub Actions para sincronizar automáticamente la documentación desde los repositorios fuente.
-
-### Funcionamiento
-
-1. **Trigger automático**: Cuando se actualiza el README de cualquier repositorio fuente
-2. **Workflow dispatch**: También se puede ejecutar manualmente desde Actions
-3. **Sincronización**: Los archivos se copian a `docs/repositories/`
-4. **Commit automático**: Los cambios se commitean automáticamente
-
-```mermaid
-graph LR
-    A[README actualizado<br/>en repo fuente] -->|repository_dispatch| B[GitHub Actions]
-    B --> C[Copia README.md]
-    C --> D[docs/repositories/REPO.md]
-    D --> E[Auto-commit]
-    
-    F[Manual Trigger] -.->|workflow_dispatch| B
-    
-    style A fill:#ffeb3b
-    style B fill:#4caf50
-    style E fill:#2196f3
-```
-
-### Ejecutar Sincronización Manual
-
-1. Ve a la pestaña **Actions**
-2. Selecciona **Update README from source repos**
-3. Click en **Run workflow**
-4. Selecciona el repositorio a sincronizar
-5. Click en **Run workflow**
 
 ## 🚀 Tecnologías
 
-- **Backend**: Python, Django, FastAPI
-- **Frontend**: React, TypeScript
-- **Databases**: PostgreSQL, QuestDB, MySQL
-- **AI/ML**: Python, Scikit-learn, XGBoost
-- **DevOps**: Docker, GitHub Actions
-- **Monitoring**: Grafana, Prometheus
+- **Lenguajes**: Python, TypeScript, SQL, PowerShell.
+- **Bases de Datos**: 
+  - **PostgreSQL**: Datos transaccionales y configuración.
+  - **QuestDB**: Almacenamiento masivo de series temporales.
+- **Protocolos**: S7 (Siemens), REST, WebSockets.
+- **Frameworks**: React, Django/FastAPI (Backend tools), Node.js.
 
-## 📊 Estado del Proyecto
+## 🔄 Sincronización Automática
 
-![Sync Status](https://img.shields.io/github/actions/workflow/status/luisrodriguezlopez96/MybrAIn-Documentation/update-readme.yml?label=Sync%20Status)
-![Last Commit](https://img.shields.io/github/last-commit/luisrodriguezlopez96/MybrAIn-Documentation)
+Este repositorio centraliza la documentación utilizando GitHub Actions para mantener los archivos actualizados desde cada repositorio fuente.
 
-## 📝 Licencia
-
-Proyecto privado - Todos los derechos reservados
-
-## 👥 Contacto
-
-Para más información sobre el proyecto MybrAIn, contacta con el equipo de desarrollo.
+```mermaid
+graph LR
+    A[Update README.md<br/>Source Repo] -->|Repository Dispatch| B[MybrAIn-Documentation]
+    B --> C[Sync docs/repositories/]
+    C --> D[Auto Commit]
+```
 
 ---
-
-**Última actualización**: Automática via GitHub Actions
+**Última actualización**: Documentación corregida y alineada con la arquitectura real del sistema.
